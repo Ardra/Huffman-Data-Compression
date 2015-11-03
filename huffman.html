@@ -1,0 +1,145 @@
+<script>
+
+var codes = {};//global var
+
+//determining relative frequency
+var getFrequency = function(string){
+	var freq = {};
+	for (var i=0; i<string.length;i++) {
+		var character = string[i];
+		if (freq[character]) {
+			freq[character]++;
+		} 
+		else {
+		freq[character] = 1;
+		}
+	}
+return freq;
+};
+
+var sort_frequency = function(result){
+var value;
+var tuple=[]
+for(var letter in result){
+	value = result[letter];
+	//alert(value);
+	//alert(letter);
+	tuple.push([value,letter]);
+}
+tuple.sort();
+return tuple;
+};
+
+var buildtree=function(tuples){
+	while(tuples.length>1){
+		//alert("inside buildtree function");
+		var leasttwo = tuples.slice(0,2);
+		//alert(JSON.stringify(leasttwo));
+		var rest = tuples.slice(2,tuples.length);
+		//alert(JSON.stringify(rest));
+		var comfreq= tuples[0][0]+tuples[1][0];
+		//alert(comfreq);
+		tuples = rest;
+		//alert("newtuples");
+		//alert(JSON.stringify(tuples));
+		//alert("new tuple");
+		tuples.push([comfreq,leasttwo]);
+		//alert(JSON.stringify(tuples));
+		tuples.sort();
+		//alert("sorted tuples");
+		//alert(JSON.stringify(tuples));
+	}
+	//alert("result");
+	//alert(JSON.stringify(tuples[0]));
+	return tuples[0];
+};
+
+var trimtree = function(tree){
+	//alert("inside trim tree");
+	var p = tree[1];
+	if(typeof p ==='string'){
+		return p;
+	}
+	else{
+		return (Array(trimtree(p[0]),trimtree(p[1])));
+	}
+};
+
+
+assigncodes = function(node,pat=""){
+	if(typeof(node) === typeof("")){
+		codes[node] = pat;
+    	}
+	else{
+		assigncodes(node[0],pat+"0");
+		assigncodes(node[1],pat+"1");	
+    	}
+	return codes;
+};
+
+
+var encode = function(str){
+	var output = "";
+	for(var i=0;i<str.length;i++){
+		output = output + codes[str[i]];
+	}
+	return output;
+};
+
+
+var decode = function(tree,str){
+	var output="";
+	var p=tree;
+	for (var i=0;i<str.length;i++){
+        	if(str[i] == '0'){
+            		p=p[0];
+            	}
+        	else{
+            		p=p[1];
+        	}
+        	if (typeof p === 'string'){
+            		output = output +p;
+            		p=tree;
+           	 }
+   	 }
+   	 return  output;
+};
+var input = prompt('Enter data');
+result = getFrequency(input);
+//alert (JSON.stringify(result)); 
+
+//alert("getFrequency function over");
+
+
+var result2 = sort_frequency(result);//result2 sorted tuple
+//alert("after sort_frequency function");
+/*for(var i in result2){
+	alert(result2[i]);
+}*/
+//alert("sort_frequency completed");
+
+var result3=buildtree(result2);//result3
+//alert(JSON.stringify(result3));
+//alert("completed tree building");
+
+var result4=trimtree(result3);//result4-trim tree output
+//alert(JSON.stringify(result4));
+//alert("completed trimtree");
+
+var result5=assigncodes(result4);
+//alert(JSON.stringify(result5));
+//alert("completed assignment of codes");
+
+result6 = encode(input);//ENCODED OUTPUT
+alert('Encoded Data \n'+result6);
+
+var final_result = decode(result4,result6);
+alert('Decoded Data \n'+final_result);//DECODED INPUT
+
+if(final_result===input){
+	alert("correct encoding and decoding");
+}
+
+</script>
+
+
